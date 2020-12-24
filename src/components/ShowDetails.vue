@@ -48,7 +48,7 @@
       </table>
     </div>
 
-    <div v-if="usersData.length > 1">
+    <div v-if="showAllData && usersData.length > 0">
       <p class="font-black text-4xl text-center mt-5">All Results</p>
       <table class="table-auto">
         <thead>
@@ -98,6 +98,7 @@ export default {
       h3: this.data && this.data.length === 1 ? "Your Height" : "Height",
       h4: this.data && this.data.length === 1 ? "Your Income" : "Income",
       isFetchingUserData: false,
+      showAllData: false,
     };
   },
 
@@ -144,8 +145,10 @@ export default {
         this.$emit("users-data", data);
 
         this.isFetchingUserData = false;
+        this.showAllData = true;
       } catch (error) {
         this.isFetchingUserData = false;
+        this.showAllData = false;
         console.log(error);
       }
     },
@@ -174,7 +177,10 @@ export default {
       }
     },
   },
-  mounted() {},
+  destroyed() {
+    this.isFetchingUserData = false;
+    this.showAllData = false;
+  },
 };
 </script>
 

@@ -42,11 +42,12 @@
       </div>
       <div class="flex justify-end">
         <button
-          :disabled="isButtonDisabled"
+          :disabled="isButtonDisabled || isFetchingUserData"
           class="flex justify-center items-center w-12 h-12 text-white font-bold py-2 px-4 rounded-full focus:outline-none"
           :class="{
-            'bg-blue-500 hover:bg-blue-700': !isButtonDisabled,
-            'bg-gray-200': isButtonDisabled,
+            'bg-blue-500 hover:bg-blue-700':
+              !isButtonDisabled || !isFetchingUserData,
+            'bg-gray-200': isButtonDisabled || isFetchingUserData,
           }"
           @click="onStoreData"
         >
@@ -113,6 +114,7 @@ export default {
       return { name };
     },
     async onStoreData() {
+      this.isFetchingUserData = true;
       const { name } = this.getUserName();
       const user = this.currentUser;
       if (!name || !user) return false;
@@ -131,11 +133,12 @@ export default {
             income: +this.income,
           },
         });
-
         const data = await res.data;
-        console.log(data);
+        this.$emit("users-data", data);
+        this.isFetchingUserData = false;
       } catch (error) {
         console.log(error);
+        this.isFetchingUserData = false;
       }
     },
     async onGetUserData() {
