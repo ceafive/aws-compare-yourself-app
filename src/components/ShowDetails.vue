@@ -116,7 +116,8 @@ export default {
       let name = " ";
 
       user.getSession(function (err, session) {
-        user.getUserData((err, user) => {
+        if (err) return;
+        user.getUserData((err) => {
           const found = user.UserAttributes.find(
             (userData) => userData.Name === "name"
           );

@@ -103,8 +103,10 @@ export default {
       const user = userPool.getCurrentUser();
       let name = "";
 
-      user.getSession(function (err, session) {
+      user.getSession(function (err) {
+        if (err) return;
         user.getUserData((err, user) => {
+          if (err) return;
           const found = user.UserAttributes.find(
             (userData) => userData.Name === "name"
           );
