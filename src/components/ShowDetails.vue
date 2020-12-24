@@ -118,6 +118,7 @@ export default {
       user.getSession(function (err, session) {
         if (err) return;
         user.getUserData((err) => {
+             if (err) return;
           const found = user.UserAttributes.find(
             (userData) => userData.Name === "name"
           );
