@@ -1,7 +1,7 @@
 <template>
   <div class="w-2/3">
-    <p class="font-black text-4xl text-center">Controls</p>
-    <div class="flex justify-between items-center my-5">
+    <p class="font-black text-3xl text-center">Controls</p>
+    <div class="flex justify-between items-center mb-5">
       <button
         class="bg-green-500 hover:bg-green-700 px-4 py-1 text-white font-bold focus:outline-none"
       >
@@ -103,32 +103,24 @@ export default {
 
   computed: {
     currentUserData() {
-      try {
-        const { name } = this.getUserName();
-        console.log(name);
-        return [];
-        // return this.usersData.find((user) => user.name === name);
-      } catch (error) {
-        console.log(error);
-        return [];
-      }
+      const { name } = this.getUserName();
+
+      const found = this.usersData.filter((user) => user.name === name);
+      return found;
     },
   },
   methods: {
     getUserName() {
       const user = userPool.getCurrentUser();
+      let name = " ";
 
-      let name = "";
-      user.getUserData((err, user) => {
-        if (err) {
-          console.log(err);
-          return null;
-        }
-
-        const found = user.UserAttributes.find(
-          (userData) => userData.Name === "name"
-        );
-        name = found.Value;
+      user.getSession(function (err, session) {
+        user.getUserData((err, user) => {
+          const found = user.UserAttributes.find(
+            (userData) => userData.Name === "name"
+          );
+          name = found.Value;
+        });
       });
 
       return { name };
@@ -157,11 +149,32 @@ export default {
         console.log(error);
       }
     },
-    onDeleteData() {},
+    async onDeleteData() {
+      this.isFetchingUserData = true;
+
+      const user = this.currentUser;
+      if (!user) return false;
+
+      const queryParam = `?accessToken=${user.accessToken}`;
+      try {
+        const res = await axios({
+          url: `/compare-yourself${queryParam}`,
+          method: "delete",
+          headers: {
+            Authorization: user.idToken,
+          },
+        });
+        const data = await res.data;
+        this.$emit("users-data", data);
+
+        this.isFetchingUserData = false;
+      } catch (error) {
+        this.isFetchingUserData = false;
+        console.log(error);
+      }
+    },
   },
-  mounted() {
-    console.log(this.getUserName());
-  },
+  mounted() {},
 };
 </script>
 

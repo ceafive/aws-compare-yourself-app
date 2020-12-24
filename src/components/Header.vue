@@ -17,7 +17,7 @@
         </button>
       </div>
       <div v-else class="flex">
-        <button class="py-1 px-2 focus:outline-none">Compare</button>
+        <button class="py-1 px-2 focus:outline-none" @click='compare'>Compare</button>
         <button
           class="text-red-500 py-1 px-2 focus:outline-none"
           @click="logout"
@@ -46,6 +46,9 @@ export default {
     logout() {
       this.$emit("logout");
     },
+    compare(){
+      this.$emit('is-compare', true)
+    }
   },
 };
 </script>

@@ -99,15 +99,15 @@ export default {
   methods: {
     getUserName() {
       const user = userPool.getCurrentUser();
-
       let name = "";
-      user.getUserData((err, user) => {
-        if (err) return null;
 
-        const found = user.UserAttributes.find(
-          (userData) => userData.Name === "name"
-        );
-        name = found.Value;
+      user.getSession(function (err, session) {
+        user.getUserData((err, user) => {
+          const found = user.UserAttributes.find(
+            (userData) => userData.Name === "name"
+          );
+          name = found.Value;
+        });
       });
 
       return { name };
@@ -157,6 +157,7 @@ export default {
         this.isFetchingUserData = false;
       } catch (error) {
         console.log(error);
+        this.$emit("users-data", []);
       }
     },
   },

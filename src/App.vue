@@ -1,6 +1,11 @@
 <template>
   <div id="app">
-    <Header @auth-mode="setLogin" :currentUser="currentUser" @logout="logout" />
+    <Header
+      @auth-mode="setLogin"
+      :currentUser="currentUser"
+      @logout="logout"
+      @is-compare="setIsCompare"
+    />
     <div class="flex flex-col justify-center items-center py-10 h-full">
       <Auth
         v-if="!currentUser"
@@ -8,12 +13,12 @@
         :on-set-user="setUser"
       />
       <Main
-        v-else-if="currentUser && usersData.length === 0"
+        v-else-if="(currentUser && usersData.length === 0) || switchToCompare"
         @users-data="setData"
         :currentUser="currentUser"
       />
       <ShowDetails
-        v-else-if="currentUser && usersData.length > 0"
+        v-else-if="(currentUser && usersData.length > 0) || !switchToCompare"
         :users-data="usersData"
         @users-data="setData"
         :currentUser="currentUser"
@@ -43,6 +48,7 @@ export default {
       currentUser: null,
       isLogin: true,
       usersData: [],
+      switchToCompare: true,
     };
   },
   computed: {
@@ -59,7 +65,7 @@ export default {
       } else {
         return user.getSession((err, session) => {
           if (err) {
-            console.log("No User", err);
+            console.log("No valid user session", err);
             return null;
           } else {
             if (session.isValid()) {
@@ -84,11 +90,20 @@ export default {
       this.currentUser = details;
     },
     setData(data) {
+      if (data && data.length > 0) {
+        this.switchToCompare = false;
+      }
+      // console.log({ data });
       this.usersData = data;
+    },
+    setIsCompare() {
+      this.switchToCompare = true;
     },
     logout() {
       userPool.getCurrentUser().signOut();
       this.currentUser = null;
+      this.isLogin = true;
+      this.usersData = [];
     },
   },
   mounted() {
