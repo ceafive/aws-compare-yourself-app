@@ -85,6 +85,7 @@ export default {
   },
   data() {
     return {
+      details: {},
       age: "",
       height: "",
       income: "",
@@ -136,6 +137,9 @@ export default {
         const data = await res.data;
         this.$emit("users-data", data);
         this.isFetchingUserData = false;
+        this.age = "";
+        this.height = "";
+        this.income = "";
       } catch (error) {
         console.log(error);
         this.isFetchingUserData = false;
