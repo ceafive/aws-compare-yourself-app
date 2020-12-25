@@ -43,25 +43,40 @@
       <label for="password" class="block text-gray-700 text-sm font-bold mb-2"
         >Password</label
       >
-      <input
-        id="password"
-        class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-2 leading-tight focus:outline-none"
-        type="password"
-        placeholder="********"
-        v-model="password"
-      />
+      <div class="relative">
+        <input
+          id="password"
+          class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-2 leading-tight focus:outline-none"
+          type="password"
+          placeholder="********"
+          v-model="password"
+        />
+        <ion-icon
+          @click="showPassword = !showPassword"
+          :name="!showPassword ? 'eye-outline' : 'eye-off-outline'"
+          class="absolute right-0 h-6 w-6 cursor-pointer"
+        ></ion-icon
+        >\
+      </div>
     </div>
     <div>
       <label for="password" class="block text-gray-700 text-sm font-bold mb-2"
         >Confirm Password</label
       >
-      <input
-        id="confirm-password"
-        class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-2 leading-tight focus:outline-none"
-        type="password"
-        placeholder="********"
-        v-model="confirmPassword"
-      />
+      <div class="relative">
+        <input
+          id="confirm-password"
+          class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-2 leading-tight focus:outline-none"
+          type="password"
+          placeholder="********"
+          v-model="confirmPassword"
+        />
+        <ion-icon
+          @click="showPassword = !showPassword"
+          :name="!showPassword ? 'eye-outline' : 'eye-off-outline'"
+          class="absolute right-0 h-6 w-6 cursor-pointer"
+        ></ion-icon>
+      </div>
     </div>
     <p v-if="error.status" class="text-center text-sm text-red-500 font-black">
       {{ error.text }}
@@ -109,6 +124,7 @@ export default {
         text: "",
       },
       user: {},
+      showPassword: false,
     };
   },
   props: {

@@ -19,13 +19,20 @@
       <label for="password" class="block text-gray-700 text-sm font-bold mb-2"
         >Password</label
       >
-      <input
-        id="password"
-        class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-2 leading-tight focus:outline-none"
-        type="password"
-        placeholder="********"
-        v-model="password"
-      />
+      <div class="relative">
+        <input
+          id="password"
+          class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-2 leading-tight focus:outline-none"
+          :type="showPassword ? 'text' : 'password'"
+          placeholder="********"
+          v-model="password"
+        />
+        <ion-icon
+          @click="showPassword = !showPassword"
+          :name="!showPassword ? 'eye-outline' : 'eye-off-outline'"
+          class="absolute right-0 h-6 w-6 cursor-pointer"
+        ></ion-icon>
+      </div>
     </div>
     <div class="flex justify-end">
       <button
@@ -55,6 +62,7 @@ export default {
       username: "",
       password: "",
       isSigningIn: false,
+      showPassword: false,
     };
   },
   computed: {
