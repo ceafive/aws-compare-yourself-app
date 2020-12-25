@@ -105,7 +105,6 @@ export default {
   computed: {
     currentUserData() {
       const { name } = this.getUserName();
-
       const found = this.usersData.filter((user) => user.name === name);
       return found;
     },
@@ -113,12 +112,18 @@ export default {
   methods: {
     getUserName() {
       const user = userPool.getCurrentUser();
-      let name = " ";
+      let name = "";
 
-      user.getSession(function (err) {
-        if (err) return;
-        user.getUserData((err) => {
-          if (err) return;
+      user.getSession((err) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        user.getUserData((err, user) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
           const found = user.UserAttributes.find(
             (userData) => userData.Name === "name"
           );
