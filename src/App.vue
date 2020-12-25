@@ -22,6 +22,7 @@
         :users-data="usersData"
         @users-data="setData"
         :currentUser="currentUser"
+        @is-compare="setIsCompare"
       />
     </div>
   </div>

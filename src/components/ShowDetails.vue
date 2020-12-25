@@ -4,7 +4,8 @@
     <div class="flex justify-between items-center mb-5">
       <button
         class="bg-green-500 hover:bg-green-700 px-4 py-1 text-white font-bold focus:outline-none"
-      >
+      
+       @click="$emit('is-compare', true)">
         Set Data
       </button>
       <button
