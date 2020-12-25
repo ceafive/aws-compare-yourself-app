@@ -1,4 +1,4 @@
 # aws-compare-yourself-app
 Created with CodeSandbox
 
-Demo App: compare-yourself.netlify.app
+Demo App: https://compare-yourself.netlify.app
