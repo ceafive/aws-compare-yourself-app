@@ -1,12 +1,12 @@
 <template>
-  <div id="app">
+  <div id="app" class="h-screen">
     <Header
       @auth-mode="setLogin"
       :currentUser="currentUser"
       @logout="logout"
       @is-compare="setIsCompare"
     />
-    <div class="flex flex-col justify-center items-center py-10 h-full">
+    <div class="flex flex-col justify-center items-center py-10 w-full">
       <Auth
         v-if="!currentUser"
         :login-mode="loginMode"
@@ -121,6 +121,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   background-color: #f4efef;
-  min-height: 100vh;
 }
 </style>
