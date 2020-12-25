@@ -29,11 +29,11 @@
     </div>
     <div class="flex justify-end">
       <button
-        :disabled="isButtonDisabled"
+        :disabled="isButtonDisabled || isSigningIn"
         class="flex justify-center items-center w-12 h-12 text-white font-bold py-2 px-4 rounded-full focus:outline-none"
         :class="{
-          'bg-blue-500 hover:bg-blue-700': !isButtonDisabled,
-          'bg-gray-200': isButtonDisabled,
+          'bg-blue-500 hover:bg-blue-700': !isButtonDisabled || !isSigningIn,
+          'bg-gray-200': isSigningIn || isButtonDisabled,
         }"
         @click="signin"
       >
@@ -54,6 +54,7 @@ export default {
     return {
       username: "",
       password: "",
+      isSigningIn: false,
     };
   },
   computed: {
@@ -65,6 +66,7 @@ export default {
   },
   methods: {
     signin() {
+      this.isSigningIn = true;
       const authData = {
         Username: this.username,
         Password: this.password,
@@ -88,10 +90,12 @@ export default {
             isValid: result.isValid,
           };
           self.$emit("user-details", userDetails);
+          this.isSigningIn = false;
         },
         onFailure(err) {
           //TODO: add error object
           console.log(err);
+          this.isSigningIn = false;
         },
       });
     },

@@ -99,39 +99,40 @@ export default {
       h4: this.data && this.data.length === 1 ? "Your Income" : "Income",
       isFetchingUserData: false,
       showAllData: false,
+      userName: "",
     };
   },
 
   computed: {
     currentUserData() {
-      const { name } = this.getUserName();
-      const found = this.usersData.filter((user) => user.name === name);
+      this.getUserName();
+      const found = this.usersData.filter(
+        (user) => user.name === this.userName
+      );
       return found;
     },
   },
   methods: {
     getUserName() {
-      const user = userPool.getCurrentUser();
-      let name = "";
+      const currentUser = userPool.getCurrentUser();
 
-      user.getSession((err) => {
+      currentUser.getSession((err) => {
         if (err) {
           console.log(err);
           return;
         }
-        user.getUserData((err, user) => {
+        currentUser.getUserData((err, user) => {
           if (err) {
             console.log(err);
             return;
           }
+
           const found = user.UserAttributes.find(
             (userData) => userData.Name === "name"
           );
-          name = found.Value;
+          return (this.userName = found.Value);
         });
       });
-
-      return { name };
     },
     async onGetAllData() {
       this.isFetchingUserData = true;
