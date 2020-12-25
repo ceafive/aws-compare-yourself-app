@@ -87,6 +87,7 @@ export default {
       this.isLogin = value;
     },
     setUser(details) {
+      // console.log({ details });
       this.currentUser = details;
     },
     setData(data) {
