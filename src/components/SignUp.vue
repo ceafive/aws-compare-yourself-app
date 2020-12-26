@@ -47,7 +47,7 @@
         <input
           id="password"
           class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-2 leading-tight focus:outline-none"
-          type="password"
+          :type="showPassword ? 'text' : 'password'"
           placeholder="********"
           v-model="password"
         />
@@ -55,9 +55,14 @@
           @click="showPassword = !showPassword"
           :name="!showPassword ? 'eye-outline' : 'eye-off-outline'"
           class="absolute right-0 h-6 w-6 cursor-pointer"
-        ></ion-icon
-        >\
+        ></ion-icon>
       </div>
+      <p
+        v-if="password && password.length < 8"
+        class="text-center text-xs text-red-500 font-black"
+      >
+        Password must be longer than 7 characters and must include numbers
+      </p>
     </div>
     <div>
       <label for="password" class="block text-gray-700 text-sm font-bold mb-2"
@@ -67,7 +72,7 @@
         <input
           id="confirm-password"
           class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-2 leading-tight focus:outline-none"
-          type="password"
+          :type="showPassword ? 'text' : 'password'"
           placeholder="********"
           v-model="confirmPassword"
         />
@@ -77,13 +82,19 @@
           class="absolute right-0 h-6 w-6 cursor-pointer"
         ></ion-icon>
       </div>
+      <p
+        v-if="confirmPassword && confirmPassword !== password"
+        class="text-center text-xs text-red-500 font-black"
+      >
+        Confirm password must be equal to password entered above
+      </p>
     </div>
     <p v-if="error.status" class="text-center text-sm text-red-500 font-black">
       {{ error.text }}
     </p>
     <div class="flex justify-end mb-2">
       <button
-        :disabled="isButtonDisabled"
+        :disabled="isButtonDisabled || isLoading"
         class="flex justify-center items-center w-12 h-12 text-white font-bold py-2 px-4 rounded-full focus:outline-none"
         :class="{
           'bg-blue-500 hover:bg-blue-700': !isButtonDisabled,
@@ -105,13 +116,20 @@
   </div>
 </template>
 
-
 <script>
 import { CognitoUserAttribute } from "amazon-cognito-identity-js";
 import { userPool } from "../utils";
 
 export default {
   name: "SignUp",
+  props: {
+    error: {
+      type: Object,
+    },
+    isShowValidateCodeForm: {
+      type: Boolean,
+    },
+  },
   data() {
     return {
       name: "",
@@ -119,18 +137,10 @@ export default {
       email: "",
       password: "",
       confirmPassword: "",
-      error: {
-        status: false,
-        text: "",
-      },
+      isLoading: false,
       user: {},
       showPassword: false,
     };
-  },
-  props: {
-    isShowValidateCodeForm: {
-      type: Boolean,
-    },
   },
   computed: {
     isButtonDisabled() {
@@ -139,7 +149,9 @@ export default {
         !this.username ||
         !this.email ||
         !this.password ||
-        !this.confirmPassword
+        !this.confirmPassword ||
+        this.password.length < 8 ||
+        this.confirmPassword.length < 8
       )
         return true;
       else return false;
@@ -151,7 +163,7 @@ export default {
     },
     signup() {
       if (!this.name || !this.email) {
-        return (this.error = {
+        return this.$emit("set-error", {
           status: true,
           text: "No Name/Email entered",
         });
@@ -179,23 +191,27 @@ export default {
         (err, result) => {
           if (err) {
             console.log(err);
-            return (this.error = {
+            return this.$emit("set-error", {
               status: true,
-              text: "User Sign Up Error occurred",
+              text: err.message,
             });
           }
           var cognitoUser = result.user;
           this.user = cognitoUser;
-          console.log("user name is " + cognitoUser.getUsername());
+          console.log("User name is " + cognitoUser.getUsername());
         }
       );
     },
   },
   destroyed() {
     this.$emit("show-validate-form", false);
+
+    this.$emit("set-error", {
+      status: false,
+      text: "",
+    });
   },
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

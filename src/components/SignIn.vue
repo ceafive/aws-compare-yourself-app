@@ -34,13 +34,16 @@
         ></ion-icon>
       </div>
     </div>
+    <p v-if="error.status" class="text-center text-sm text-red-500 font-black">
+      {{ error.text }}
+    </p>
     <div class="flex justify-end">
       <button
-        :disabled="isButtonDisabled || isSigningIn"
+        :disabled="isButtonDisabled"
         class="flex justify-center items-center w-12 h-12 text-white font-bold py-2 px-4 rounded-full focus:outline-none"
         :class="{
-          'bg-blue-500 hover:bg-blue-700': !isButtonDisabled || !isSigningIn,
-          'bg-gray-200': isSigningIn || isButtonDisabled,
+          'bg-blue-500 hover:bg-blue-700': !isButtonDisabled,
+          'bg-gray-200': isButtonDisabled,
         }"
         @click="signin"
       >
@@ -50,18 +53,22 @@
   </div>
 </template>
 
-
 <script>
 import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js";
 import { userPool } from "../utils";
 
 export default {
   name: "SignIn",
+  props: {
+    error: {
+      type: Object,
+    },
+  },
   data() {
     return {
       username: "",
       password: "",
-      isSigningIn: false,
+      isDisabled: false,
       showPassword: false,
     };
   },
@@ -69,19 +76,18 @@ export default {
     isButtonDisabled() {
       if (!this.username || !this.password || this.password.length < 8)
         return true;
-      else return false;
+      else return this.isDisabled;
     },
   },
   methods: {
     signin() {
-      this.isSigningIn = true;
+      this.isDisabled = true;
       const authData = {
         Username: this.username,
         Password: this.password,
       };
 
       const authDetails = new AuthenticationDetails(authData);
-
       const userData = {
         Username: this.username,
         Pool: userPool,
@@ -94,22 +100,28 @@ export default {
           const userDetails = {
             accessToken: result.accessToken.jwtToken,
             idToken: result.idToken.jwtToken,
-            refreshToken: result.refreshToken.jwtToken,
-            isValid: result.isValid,
           };
           self.$emit("user-details", userDetails);
-          this.isSigningIn = false;
+          self.isDisabled = false;
         },
         onFailure(err) {
-          //TODO: add error object
+          self.isDisabled = false;
+          self.$emit("set-error", {
+            status: true,
+            text: err.message,
+          });
           console.log(err);
-          this.isSigningIn = false;
         },
       });
     },
   },
+  destroyed() {
+    this.$emit("set-error", {
+      status: false,
+      text: "",
+    });
+  },
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

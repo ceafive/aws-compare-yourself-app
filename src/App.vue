@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="h-screen">
+  <div id="app" class="min-h-screen ">
     <Header
       @auth-mode="setLogin"
       :currentUser="currentUser"
@@ -11,11 +11,15 @@
         v-if="!currentUser"
         :login-mode="loginMode"
         :on-set-user="setUser"
+        :set-error="setError"
+        :error="error"
       />
       <Main
         v-else-if="(currentUser && usersData.length === 0) || switchToCompare"
         @users-data="setData"
         :currentUser="currentUser"
+        @set-error="setError"
+        :error="error"
       />
       <ShowDetails
         v-else-if="(currentUser && usersData.length > 0) || !switchToCompare"
@@ -23,6 +27,8 @@
         @users-data="setData"
         :currentUser="currentUser"
         @is-compare="setIsCompare"
+        @set-error="setError"
+        :error="error"
       />
     </div>
   </div>
@@ -50,6 +56,10 @@ export default {
       isLogin: true,
       usersData: [],
       switchToCompare: true,
+      error: {
+        status: false,
+        text: "",
+      },
     };
   },
   computed: {
@@ -100,6 +110,9 @@ export default {
     },
     setIsCompare() {
       this.switchToCompare = true;
+    },
+    setError(error) {
+      this.error = error;
     },
     logout() {
       userPool.getCurrentUser().signOut();

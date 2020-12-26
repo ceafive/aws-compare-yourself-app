@@ -3,13 +3,23 @@
     <p class="font-black text-3xl text-center">Controls</p>
     <div class="flex justify-between items-center mb-5">
       <button
-        class="bg-green-500 hover:bg-green-700 px-4 py-1 text-white font-bold focus:outline-none"
-      
-       @click="$emit('is-compare', true)">
+        :disabled="isFetchingUserData"
+        class="px-4 py-1 text-white font-bold focus:outline-none"
+        :class="{
+          'bg-green-500 hover:bg-green-700': !isFetchingUserData,
+          'bg-gray-200': isFetchingUserData,
+        }"
+        @click="$emit('is-compare', true)"
+      >
         Set Data
       </button>
       <button
-        class="bg-red-500 hover:bg-red-700 px-4 py-1 text-white font-bold focus:outline-none"
+        :disabled="isFetchingUserData"
+        class="px-4 py-1 text-white font-bold focus:outline-none"
+        :class="{
+          'bg-red-500 hover:bg-red-700': !isFetchingUserData,
+          'bg-gray-200': isFetchingUserData,
+        }"
         @click="onDeleteData"
       >
         Clear Data on Server
@@ -76,7 +86,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from "../utils/axios";
@@ -193,5 +202,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

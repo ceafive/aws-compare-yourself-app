@@ -13,7 +13,7 @@
           class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 leading-tight focus:outline-none"
           type="text"
           placeholder="28"
-          v-model="age"
+          v-model="userDetails.age"
         />
       </div>
       <div>
@@ -25,7 +25,7 @@
           class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-3 leading-tight focus:outline-none"
           type="text"
           placeholder="171"
-          v-model="height"
+          v-model="userDetails.height"
         />
       </div>
       <div>
@@ -37,17 +37,22 @@
           class="appearance-none border-b-2 w-full py-1 pr-3 text-gray-700 mb-3 leading-tight focus:outline-none"
           type="text"
           placeholder="10000"
-          v-model="income"
+          v-model="userDetails.income"
         />
       </div>
+      <p
+        v-if="error.status"
+        class="text-center text-sm text-red-500 font-black"
+      >
+        {{ error.text }}
+      </p>
       <div class="flex justify-end">
         <button
-          :disabled="isButtonDisabled || isFetchingUserData"
+          :disabled="isButtonDisabled"
           class="flex justify-center items-center w-12 h-12 text-white font-bold py-2 px-4 rounded-full focus:outline-none"
           :class="{
-            'bg-blue-500 hover:bg-blue-700':
-              !isButtonDisabled || !isFetchingUserData,
-            'bg-gray-200': isButtonDisabled || isFetchingUserData,
+            'bg-blue-500 hover:bg-blue-700': !isButtonDisabled,
+            'bg-gray-200': isButtonDisabled,
           }"
           @click="onStoreData"
         >
@@ -71,7 +76,6 @@
   </div>
 </template>
 
-
 <script>
 import { userPool } from "../utils";
 import axios from "../utils/axios";
@@ -82,20 +86,34 @@ export default {
     currentUser: {
       type: Object,
     },
+    error: {
+      type: Object,
+    },
   },
-  data() {
+  data: () => {
     return {
-      details: {},
-      age: "",
-      height: "",
-      income: "",
+      initialData: {
+        age: "",
+        height: "",
+        income: "",
+      },
+      userDetails: {
+        age: "",
+        height: "",
+        income: "",
+      },
       isFetchingUserData: false,
     };
   },
   computed: {
     isButtonDisabled() {
-      if (!this.age || !this.height || !this.income) return true;
-      else return false;
+      if (
+        !this.userDetails.age ||
+        !this.userDetails.height ||
+        !this.userDetails.income
+      )
+        return true;
+      else return this.isFetchingUserData;
     },
   },
   methods: {
@@ -103,7 +121,7 @@ export default {
       const user = userPool.getCurrentUser();
       let name = "";
 
-      user.getSession(function (err) {
+      user.getSession(function(err) {
         if (err) return;
         user.getUserData((err, user) => {
           if (err) return;
@@ -131,17 +149,24 @@ export default {
           },
           data: {
             name,
-            age: +this.age,
-            height: +this.height,
-            income: +this.income,
+            age: +this.userDetails.age,
+            height: +this.userDetails.height,
+            income: +this.userDetails.income,
           },
         });
         const data = await res.data;
+        // console.log(data);
+
+        if (data.length === 0) {
+          this.$emit("set-error", {
+            status: true,
+            text: "No details stored, please input your details again",
+          });
+        }
+
         this.$emit("users-data", data);
         this.isFetchingUserData = false;
-        this.age = "";
-        this.height = "";
-        this.income = "";
+        this.userDetails = this.initialData;
       } catch (error) {
         console.log(error);
         this.isFetchingUserData = false;
@@ -162,16 +187,31 @@ export default {
           },
         });
         const data = await res.data;
+
+        if (data.length === 0) {
+          this.$emit("set-error", {
+            status: true,
+            text: "No details found, please input your details",
+          });
+        }
+
         this.$emit("users-data", data);
         this.isFetchingUserData = false;
+        this.userDetails = this.initialData;
       } catch (error) {
         console.log(error);
+        this.isFetchingUserData = false;
         this.$emit("users-data", []);
       }
     },
   },
+  destroyed() {
+    this.$emit("set-error", {
+      status: false,
+      text: "",
+    });
+  },
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
